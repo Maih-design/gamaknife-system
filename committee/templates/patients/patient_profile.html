@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.section {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+
+.btn {
+    background: var(--primary);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: var(--secondary);
+}
+.small {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.doc-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid var(--border);
+}
+</style>
+
+<!-- 🟢 PATIENT INFO -->
+<div class="section">
+    <h2>{{ patient.full_name }}</h2>
+    <p class="small">{{ patient.national_id }}</p>
+</div>
+
+<!-- 🟡 UPDATE PATIENT -->
+<!-- ✏️ تحديث بيانات المريض -->
+<div class="section">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-bottom:15px;
+    ">
+
+        <h3>✏️ تحديث البيانات</h3>
+
+        <button type="button"
+                class="btn"
+                onclick="toggleEditForm()">
+
+            تعديل البيانات
+
+        </button>
+
+    </div>
+
+    <!-- FORM -->
+    <div id="edit-form" style="display:none;">
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <div>
+                    <label>اسم المريض</label>
+                    {{ patient_form.full_name }}
+                </div>
+
+                <div>
+                    <label>رقم الهاتف</label>
+                    {{ patient_form.phone_number }}
+                </div>
+
+                <div>
+                    <label>المحافظة</label>
+                    {{ patient_form.governorate }}
+                </div>
+
+                <div>
+                    <label>الفرع التابع له</label>
+                    {{ patient_form.affiliated_branch }}
+                </div>
+
+                <div class="full">
+                    <label>التشخيص</label>
+                    {{ patient_form.diagnosis }}
+                </div>
+
+            </div>
+
+            <br>
+
+            <button class="btn"
+                    type="submit"
+                    name="update_patient">
+
+                حفظ التحديث
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- 🟢 UPLOAD DOCUMENT -->
+<div class="section">
+
+    <h3>📎 رفع مستند</h3>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        {% csrf_token %}
+
+        {{ document_form.document_type }}
+        {{ document_form.file }}
+
+        <button class="btn btn-secondary"
+                type="submit"
+                name="upload_document">
+
+            رفع المستند
+
+        </button>
+
+    </form>
+
+</div>
+
+<!-- 📁 DOCUMENT LIST -->
+<div class="section">
+    <h3>📂 المستندات</h3>
+
+    {% for doc in patient.documents.all %}
+        <div class="doc-item">
+            <div>
+                {{ doc.title }} <br>
+                <span class="small">{{ doc.uploaded_at }}</span>
+            </div>
+
+            <div>
+                <a href="{{ doc.file.url }}" target="_blank">عرض</a> |
+                <a href="{{ doc.file.url }}" download>تحميل</a> |
+                <a href="{{ doc.file.url }}" onclick="window.print()">طباعة</a>
+            </div>
+        </div>
+    {% empty %}
+        <p class="small">لا توجد مستندات</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

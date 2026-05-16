@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if form.errors %}
+
+    <div class="alert-error">
+
+        {{ form.errors }}
+
+    </div>
+
+{% endif %}
+<div class="form-card">
+
+    <div class="form-title">➕ إضافة مريض جديد</div>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+            <div>
+                <label>الرقم القومي</label>
+                {{ form.national_id }}
+            </div>
+
+            <div>
+                <label>اسم المريض</label>
+                {{ form.full_name }}
+            </div>
+
+            <div>
+                <label>تاريخ الميلاد</label>
+                {{ form.birth_date }}
+            </div>
+
+            <div>
+                <label>النوع</label>
+                {{ form.gender }}
+            </div>
+
+            <div>
+                <label>رقم الهاتف</label>
+                {{ form.phone_number }}
+            </div>
+
+            <div>
+                <label>المحافظة</label>
+                {{ form.governorate }}
+            </div>
+
+            <div class="full">
+                <label>الفرع التابع له</label>
+                {{ form.affiliated_branch }}
+            </div>
+
+            <div class="full">
+                <label>التشخيص</label>
+                {{ form.diagnosis }}
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="btn" type="submit">
+            حفظ المريض
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

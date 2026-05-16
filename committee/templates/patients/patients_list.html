@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.page-card {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.search-box input {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+}
+
+.search-btn {
+    background: var(--primary);
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.table th, .table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+    font-size: 14px;
+}
+
+.table th {
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.badge {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: #D1FAE5;
+    color: #047857;
+    font-size: 12px;
+}
+</style>
+
+<div class="page-card">
+
+    <h2 style="color: var(--primary);">👥 قائمة المرضى</h2>
+
+    <!-- 🔎 SEARCH + FILTER -->
+    <form method="GET" class="search-box">
+
+        <input type="text"
+               name="search"
+               placeholder="بحث بالاسم أو الرقم القومي"
+               value="{{ search_query }}">
+
+        <input type="date" name="start_date" value="{{ start_date }}">
+        <input type="date" name="end_date" value="{{ end_date }}">
+
+        <button class="search-btn" type="submit">
+            بحث
+        </button>
+
+    </form>
+
+    <!-- TABLE -->
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>الرقم القومي</th>
+                <th>الاسم</th>
+                <th>المحافظة</th>
+                <th>الفرع</th>
+                <th>الحالة</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.national_id }}</td>
+                <td>
+    <a href="{% url 'patient_profile' patient.id %}"
+       class="patient-link">
+
+        {{ patient.full_name }}
+
+    </a>
+</td>
+                <td>{{ patient.governorate }}</td>
+                <td>{{ patient.affiliated_branch }}</td>
+                <td><span class="badge">نشط</span></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">لا يوجد نتائج</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}
