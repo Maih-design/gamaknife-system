@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import PatientForm, PatientUpdateForm, PatientDocumentForm
-from .models import Patient
+from .forms import PatientForm, PatientUpdateForm, PatientDocumentForm, CommitteeSessionForm
+from .models import Patient, CommitteeCase, CommitteeSession
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.contrib import messages
+
+from django.shortcuts import render
+
+
+def home(request):
+    return render(request, "home.html")
 
 
 #@login_required
@@ -105,3 +111,96 @@ def patient_profile(request, pk):
         "document_form": document_form,
     })
     
+
+def create_committee_session(request):
+
+    if request.method == "POST":
+
+        form = CommitteeSessionForm(request.POST)
+
+        if form.is_valid():
+
+            session = form.save()
+
+            return redirect(
+                "add_case_to_session",
+                session_id=session.id
+            )
+
+    else:
+
+        form = CommitteeSessionForm()
+
+    return render(
+        request,
+        "sessions/create_session.html",
+        {
+            "form": form
+        }
+    )
+    
+
+
+def add_case_to_session(request, session_id):
+
+    session = get_object_or_404(
+        CommitteeSession,
+        id=session_id
+    )
+
+    patient = None
+
+    query = request.GET.get("q")
+
+    if query:
+
+        patient = Patient.objects.filter(
+            national_id=query
+        ).first()
+
+    if request.method == "POST":
+
+        patient_id = request.POST.get("patient_id")
+
+        patient = get_object_or_404(
+            Patient,
+            id=patient_id
+        )
+
+        CommitteeCase.objects.create(
+            patient=patient,
+            committee_session=session
+        )
+
+        return redirect(
+            "add_case_to_session",
+            session_id=session.id
+        )
+
+    return render(
+        request,
+        "sessions/add_case.html",
+        {
+            "session": session,
+            "patient": patient,
+        }
+    )
+    
+
+
+def pending_cases(request):
+
+    cases = CommitteeCase.objects.filter(
+        status="pending"
+    ).select_related(
+        "patient",
+        "committee_session"
+    )
+
+    return render(
+        request,
+        "cases/pending_cases.html",
+        {
+            "cases": cases
+        }
+    )

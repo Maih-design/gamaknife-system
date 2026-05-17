@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="form-card">
+
+    <div class="form-title">
+        🏛️ إنشاء جلسة لجنة
+    </div>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <div class="form-grid">
+
+            <div>
+                <label>تاريخ الجلسة</label>
+                {{ form.session_date }}
+            </div>
+
+            <div class="full">
+                <label>الأطباء</label>
+                {{ form.doctors }}
+            </div>
+
+            <div class="full">
+                <label>ملاحظات</label>
+                {{ form.notes }}
+            </div>
+
+        </div>
+
+        <br>
+
+        <button class="btn" type="submit">
+            حفظ الجلسة
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

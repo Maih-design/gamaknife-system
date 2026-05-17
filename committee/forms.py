@@ -1,5 +1,5 @@
 from django import forms
-from .models import Patient, PatientDocument 
+from .models import Patient, PatientDocument, CommitteeSession
 
 
 class PatientForm(forms.ModelForm):
@@ -22,9 +22,6 @@ class PatientForm(forms.ModelForm):
             "diagnosis": forms.Textarea(attrs={"rows": 3}),
         }
         
-from django import forms
-from .models import PatientDocument
-
 
 class PatientDocumentForm(forms.ModelForm):
 
@@ -52,3 +49,31 @@ class PatientUpdateForm(forms.ModelForm):
             "affiliated_branch",
             "diagnosis",
         ]
+        
+        
+
+class CommitteeSessionForm(forms.ModelForm):
+
+    class Meta:
+        model = CommitteeSession
+
+        fields = [
+            "session_date",
+            "doctors",
+            "notes",
+        ]
+
+        widgets = {
+
+            "session_date": forms.DateInput(
+                attrs={"type": "date"}
+            ),
+
+            "doctors": forms.SelectMultiple(
+                attrs={"class": "form-control"}
+            ),
+
+            "notes": forms.Textarea(
+                attrs={"rows": 3}
+            ),
+        }

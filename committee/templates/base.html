@@ -24,14 +24,20 @@
 
 body {background:var(--bg);color:var(--text);}
 
-.container {display:flex;height:100vh;}
-
+.container {
+    display: block;
+    min-height: 100vh;
+}
 /* SIDEBAR */
-.sidebar {
-    width:260px;
-    background:white;
-    border-left:1px solid var(--border);
-    padding:20px;
+.nav-links a {
+    margin-left: 15px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: var(--primary);
 }
 
 .logo {color:var(--primary);font-weight:bold;margin-bottom:25px;}
@@ -179,16 +185,20 @@ function toggleEditForm() {
 <body>
 <div class="container">
 
-<div class="sidebar">
-<div class="logo">🏥 Medical System</div>
+<div class="topbar">
 
-<div class="nav">
-<a href="/" class="active">Dashboard</a>
-<a href="/patients/">المرضى</a>
-<a href="/cases/">الحالات</a>
-<a href="/procedures/">الإجراءات</a>
-<a href="/referrals/">التحويلات</a>
-</div>
+    <div>
+        🏥 Medical System
+    </div>
+
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/patients/">Patients</a>
+        <a href="/cases/">Cases</a>
+        <a href="/procedures/">Procedures</a>
+        <a href="/referrals/">Referrals</a>
+    </div>
+
 </div>
 
 <div class="main">

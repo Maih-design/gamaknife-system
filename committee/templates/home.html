@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>🏠 الصفحة الرئيسية</h2>
+<p class="small">مرحبًا بك في نظام لجنة الأورام</p>
+
+<!-- QUICK ACTIONS -->
+<div class="grid">
+
+    <div class="card">
+        <h3>➕ مريض جديد</h3>
+        <p class="small">إضافة بيانات مريض جديد</p>
+        <a class="btn" href="/patients/create/">فتح</a>
+    </div>
+
+    <div class="card">
+        <h3>🏛️ إنشاء جلسة</h3>
+        <p class="small">إنشاء جلسة لجنة جديدة</p>
+        <a class="btn" href="sessions/session/create">فتح</a>
+    </div>
+
+    <div class="card">
+        <h3>📋 عرض الحالات</h3>
+        <p class="small">الحالات في انتظار العرض</p>
+        <a class="btn" href="cases/pending/">فتح</a>
+    </div>
+
+</div>
+
+<br>
+
+<!-- SMALL SECTION -->
+<div class="grid">
+
+    <!-- PENDING CASES -->
+    <div class="card">
+        <h3>⏳ حالات قيد العرض</h3>
+        <p class="small">آخر الحالات المضافة للجنة</p>
+
+        <a class="btn" href="/committee/cases/pending/">
+            عرض
+        </a>
+    </div>
+
+    <!-- PRINTABLE CARD (YOUR IDEA 👌) -->
+    <div class="card">
+        <h3>📄 المستندات المطلوبة</h3>
+        <p class="small">
+            قائمة المستندات المطلوبة للعرض على اللجنة
+        </p>
+
+        <a class="btn" href="/required-documents/" target="_blank">
+            🖨️ طباعة
+        </a>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="card">
+        <h3>🔍 بحث عن مريض</h3>
+        <p class="small">بحث بالرقم القومي أو رقم الملف</p>
+
+        <a class="btn" href="/patients/search/">
+            فتح
+        </a>
+    </div>
+
+</div>
+
+<br>
+
+<!-- INFO STRIP -->
+<div class="card">
+    <h3>📌 ملاحظات النظام</h3>
+    <p class="small">
+        هذا النظام مخصص لإدارة حالات الأورام وعروض اللجان الطبية
+        وتتبع القرارات الطبية بشكل منظم.
+    </p>
+</div>
+
+{% endblock %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 
 # =========================================================
@@ -78,6 +79,21 @@ class Patient(BaseModel):
         verbose_name = "مريض"
         verbose_name_plural = "المرضى"
         ordering = ["full_name"]
+        
+        
+class Doctor(BaseModel):
+
+    full_name = models.CharField(
+        max_length=255,
+        verbose_name="اسم الطبيب"
+    )
+
+    def __str__(self):
+        return self.full_name
+
+    class Meta:
+        verbose_name = "طبيب"
+        verbose_name_plural = "الأطباء"
 
 
 # =========================================================
@@ -122,27 +138,56 @@ class PatientDocument(BaseModel):
 # Committee Case
 # =========================================================
 
+class CommitteeSession(BaseModel):
+
+    class Status(models.TextChoices):
+
+        OPEN = "open", "مفتوحة"
+        CLOSED = "closed", "مغلقة"
+
+    session_date = models.DateField(
+        verbose_name="تاريخ الجلسة"
+    )
+
+    doctors = models.ManyToManyField(
+        Doctor,
+        related_name="committee_sessions",
+        verbose_name="الأطباء"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.OPEN,
+        verbose_name="حالة الجلسة"
+    )
+
+    notes = models.TextField(
+        blank=True,
+        verbose_name="ملاحظات"
+    )
+
+    def __str__(self):
+        return f"لجنة {self.session_date}"
+
+    class Meta:
+        verbose_name = "جلسة لجنة"
+        verbose_name_plural = "جلسات اللجنة"
+        ordering = ["-session_date"]
+        
+
 class CommitteeCase(BaseModel):
 
     class Status(models.TextChoices):
-        PENDING = "pending", "قيد المراجعة"
-        APPROVED = "approved", "مقبول"
-        REJECTED = "rejected", "مرفوض"
-        FOLLOW_UP = "follow_up", "متابعة"
+
+        PENDING = "pending", "في انتظار العرض"
+        REVIEWED = "reviewed", "تم العرض"
 
     patient = models.ForeignKey(
         Patient,
         on_delete=models.CASCADE,
-        related_name="cases",
+        related_name="committee_cases",
         verbose_name="المريض"
-    )
-
-    committee_date = models.DateField(
-        verbose_name="تاريخ اللجنة"
-    )
-
-    diagnosis_details = models.TextField(
-        verbose_name="تفاصيل التشخيص"
     )
 
     status = models.CharField(
@@ -152,18 +197,35 @@ class CommitteeCase(BaseModel):
         verbose_name="الحالة"
     )
 
+    committee_date = models.DateField(
+        verbose_name="تاريخ اللجنة"
+    )
+    
+    committee_session = models.ForeignKey(
+    CommitteeSession,
+    on_delete=models.CASCADE,
+    related_name="cases"
+    )
+
     notes = models.TextField(
         blank=True,
         verbose_name="ملاحظات"
     )
 
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
-        return f"{self.patient.full_name} - {self.committee_date}"
+        return f"{self.patient.full_name} - {self.get_status_display()}"
 
     class Meta:
-        verbose_name = "حالة لجنة"
-        verbose_name_plural = "حالات اللجنة"
-        ordering = ["-committee_date"]
+        verbose_name = "عرض لجنة"
+        verbose_name_plural = "عروض اللجنة"
+        ordering = ["-created_at"]
 
 
 # =========================================================
@@ -188,6 +250,11 @@ class Procedure(BaseModel):
         unique=True,
         verbose_name="اسم الإجراء"
     )
+    
+    requires_referral = models.BooleanField(
+        default=False,
+        verbose_name="يتطلب تحويل؟"
+    )
 
     def __str__(self):
         return self.name
@@ -204,42 +271,41 @@ class Procedure(BaseModel):
 
 class CommitteeRecommendation(BaseModel):
 
-    case = models.ForeignKey(
+    committee_case = models.OneToOneField(
         CommitteeCase,
         on_delete=models.CASCADE,
-        related_name="recommendations",
-        verbose_name="الحالة"
+        related_name="recommendation"
     )
 
     procedure = models.ForeignKey(
         Procedure,
-        on_delete=models.PROTECT,
-        related_name="recommendations",
-        verbose_name="الإجراء"
+        on_delete=models.CASCADE
     )
 
-    sessions_count = models.PositiveIntegerField(
-        null=True,
-        blank=True,
-        verbose_name="عدد الجلسات"
+    recommendation_text = models.TextField(
+        verbose_name="قرار اللجنة",
+  
     )
 
     notes = models.TextField(
-        blank=True,
-        verbose_name="ملاحظات"
+        blank=True
     )
 
     def __str__(self):
-        return f"{self.case.patient.full_name} - {self.procedure.name}"
-
-    class Meta:
-        verbose_name = "توصية لجنة"
-        verbose_name_plural = "توصيات اللجنة"
+        return self.committee_case.patient.full_name
 
 
 # =========================================================
 # Referrals
 # =========================================================
+
+class ReferralCenter(models.Model):
+
+    name = models.CharField(max_length=255, verbose_name="اسم الجهة")
+    address = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.name
 
 class Referral(BaseModel):
 
@@ -260,10 +326,11 @@ class Referral(BaseModel):
         verbose_name="رقم التحويل"
     )
 
-    referred_to = models.CharField(
-        max_length=255,
-        verbose_name="الجهة المحول إليها"
-    )
+    organization = models.ForeignKey(
+    ReferralCenter,
+    on_delete=models.PROTECT,
+    verbose_name="الجهة المحول إليها"
+)
 
     status = models.CharField(
         max_length=20,
@@ -289,3 +356,6 @@ class Referral(BaseModel):
         verbose_name = "تحويل"
         verbose_name_plural = "التحويلات"
         ordering = ["-created_at"]
+        
+
+

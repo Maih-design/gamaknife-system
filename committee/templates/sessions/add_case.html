@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="section">
+
+    <h2>
+        🏛️ جلسة لجنة {{ session.session_date }}
+    </h2>
+
+</div>
+
+
+<div class="section">
+
+    <h3>🔍 بحث عن مريض</h3>
+
+    <form method="GET">
+
+        <input
+            type="text"
+            name="q"
+            placeholder="الرقم القومي"
+        >
+
+        <button class="btn">
+            بحث
+        </button>
+
+    </form>
+
+</div>
+
+
+{% if patient %}
+
+<div class="section">
+
+    <h3>{{ patient.full_name }}</h3>
+
+    <p>{{ patient.national_id }}</p>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="patient_id"
+            value="{{ patient.id }}"
+        >
+
+        <button class="btn">
+            ➕ إضافة للعرض
+        </button>
+
+    </form>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

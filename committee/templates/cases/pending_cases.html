@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>⏳ الحالات قيد العرض على اللجنة</h2>
+
+{% for case in cases %}
+
+<div class="card">
+
+    <h3>👤 {{ case.patient.full_name }}</h3>
+
+    <p>🆔 {{ case.patient.national_id }}</p>
+
+    <p>📅 الجلسة: {{ case.committee_session.session_date }}</p>
+
+    <p class="small">التشخيص: {{ case.patient.diagnosis }}</p>
+
+    <a class="btn"
+       href="/cases/{{ case.id }}/review/">
+
+        ➕ إضافة قرار اللجنة
+
+    </a>
+
+</div>
+
+{% empty %}
+
+<p>لا توجد حالات قيد العرض</p>
+
+{% endfor %}
+
+{% endblock %}
